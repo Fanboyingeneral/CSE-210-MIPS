@@ -48,7 +48,8 @@ def convert_to_machine_code(assembly_code):
                 _, rs, rt, imm = parts
             rt_bin = register_map[rt]
             rs_bin = register_map[rs]
-            imm_bin = format(int(imm), '08b')
+            imm_bin = format(int(imm) & 0xFF, '08b')  # Convert to 2's complement for an 8-bit number
+
             machine_code = f"{opcode}{rs_bin}{rt_bin}{imm_bin}"
         elif opcode_id == 'P':  # J-type
             _, target = parts
@@ -66,32 +67,17 @@ def write_to_file(machine_codes, file_name="machine_code.txt"):
     with open(file_name, "w") as file:
         file.write("v2.0 raw\n")
         for binary_code in machine_codes:
+            print(binary_code)
             hex_code = f"{int(binary_code, 2):05X}"  # Ensure 8 hexadecimal digits
             file.write(hex_code + " ")
 
 # Sample input (list of MIPS assembly lines)
 assembly_code = [
-    "beq $t0, $t1, 5",
     "addi $t0, $zero, 5",
-    "add $t1, $t0, $t2",
-    "sub $t2, $t1, $t3",
-    "subi $t1, $t2, 3",
-    "and $t3, $t1, $t2",
-    "addi $t4, $t3, 7",
-    "or $t4, $t3, $t2",
-    "ori $t4, $t3, 7",
-    "sll $t4, $t4, 2",
-    "srl $t4, $t4, 2",
-    "nor $t4, $t3, $t2",
-    "sw $t4, 4($sp)",
-    "lw $t4, 4($sp)",
-    "addi $t3, $t3, 125",
-    "beq $t4, $t3, 1",
-    "j 10",
-    "bneq $t4, $t3, 1"
-    
-
-]
+    "addi $sp, $sp, -1",
+    "sw $t0, 0($sp)",
+    "lw $t1, 0($sp)"
+    ]
 
 # Convert to machine code
 machine_code_output = convert_to_machine_code(assembly_code)
